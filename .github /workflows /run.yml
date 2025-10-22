@@ -1,1 +1,36 @@
+name: Run Amazon Price Tracker
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # every 6 hours
+    - cron: '0 */6 * * *'
+
+jobs:
+  run-tracker:
+    runs-on: ubuntu-latest
+    env:
+      # These will be injected from repository Secrets (set in Settings → Secrets and variables → Actions)
+      TELEGRAM_LOW_TOKEN: ${{ secrets.TELEGRAM_LOW_TOKEN }}
+      TELEGRAM_MEDIUM_TOKEN: ${{ secrets.TELEGRAM_MEDIUM_TOKEN }}
+      TELEGRAM_HIGH_TOKEN: ${{ secrets.TELEGRAM_HIGH_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Amazon Deal Tracker
+        run: |
+          # Ensure the script is executable and run it
+          python main.py
 
